@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="UTF-8">
+    <title>Haywire Flickers</title>
+  </head>
+
+  <body>
+    <div id="parent">
+      <div id="main">
+      </div>
+    </div>
+
+    <style>
+      #parent {
+        display: flex;
+      }
+
+      #main {
+        align-items: flex-start;
+        display: flex;
+        width: auto;
+      }
+
+      #child {
+        display: flex;
+        flex-direction: column;
+        width: auto;
+      }
+
+      #rows {
+        display: flex;
+        height: 1.4rem;
+        width: 1.4rem;
+        margin: 0.2rem;
+      }
+
+    </style>
+
+    <script type="text/javascript">
+// The goal is to have a grid where randomly chosen individual cells change properties (color, size, roundness, etc.)
+
+      const rowQuant = 9;  // set the number of rows
+      const colQuant = 9;  // set the number of columns
+
+      let rowArray = [];  // turn the row number into an array of unique indices
+      for (var i = 0; i < rowQuant; i++) {
+        rowArray.push(i);
+      };
+
+      let colArray = [];  // turn the column number into an array of unique rows
+      for (var i = 0; i < colQuant; i++) {
+        colArray.push(i);
+      };
+
+  // First, construct a Cell Matrix
+      colArray.forEach(function(k){  // nest 2 forEach loops to iterate through individual cells in each column and then a row of columns
+        const mainDiv = document.getElementById('main');
+        var colDiv = document.createElement('div');
+        colDiv.id = 'child';
+        colDiv.style.order = `${k}`;
+        rowArray.forEach(function(j){
+          var singleBox = document.createElement('div');
+          singleBox.className = `${k},${j}`;
+          singleBox.id = 'rows';
+          singleBox.style.order = `${j}`;
+          colDiv.appendChild(singleBox);  // throw the individual cells inside the first column div
+        });
+        mainDiv.appendChild(colDiv); // throw the column divs inside the mainDiv
+      });
+
+  // Second, use a function to randomly generate a hex color value
+      const hexOpts = ['0','1','2','3','4','5','6','7','8','9','a','b','c','d','e','f'];  // possibilities for the color randomizer
+      function mysteryColor(simon) {
+        const swatchCell = document.getElementsByClassName(`${simon}`);
+        let hexVal = '#';
+        for (var i = 0; i < 6; i++) {
+          const valPicker = Math.floor(Math.random()*16);  // Math.floor() gives an integer, Math.random() gives a value btw 0 & 1
+          hexVal += hexOpts[valPicker];
+          if (hexVal.length == 7) {
+            swatchCell[0].style.background = `${hexVal}`;
+          }
+        };
+      };
+
+  // Third, use a function to randomly pick one of the matrix cells
+      function simonCells() {
+        const x = Math.floor(Math.random()*colQuant);
+        const y = Math.floor(Math.random()*rowQuant);
+        const cell = `${x},${y}`;
+        mysteryColor(cell); // call the color changer fn on the chosen cell
+      };
+      setInterval(simonCells, 2); // call the cell picker within an interval timer
+    </script>
+
+  </body>
+</html>
