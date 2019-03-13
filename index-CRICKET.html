@@ -41,8 +41,8 @@
     <script type="text/javascript">
 // The goal is to have a grid where randomly chosen individual cells change properties (color, size, roundness, etc.)
 
-      const rowQuant = 9;  // set the number of rows
-      const colQuant = 9;  // set the number of columns
+      const rowQuant = 16;  // set the number of rows
+      const colQuant = 16;  // set the number of columns
 
       let rowArray = [];  // turn the row number into an array of unique indices
       for (var i = 0; i < rowQuant; i++) {
@@ -75,10 +75,10 @@
       function mysteryColor(simon) {
         const swatchCell = document.getElementsByClassName(`${simon}`);
         let hexVal = '#';
-        for (var i = 0; i < 6; i++) {
+        for (var i = 0; i < 6; i++) { // randomly pick 6 characters to create a new hex color
           const valPicker = Math.floor(Math.random()*16);  // Math.floor() gives an integer, Math.random() gives a value btw 0 & 1
           hexVal += hexOpts[valPicker];
-          if (hexVal.length == 7) {
+          if (hexVal.length == 7) { // once the string is complete, update the background color of the specified cell
             swatchCell[0].style.background = `${hexVal}`;
           }
         };
@@ -91,8 +91,11 @@
         const cell = `${x},${y}`;
         mysteryColor(cell); // call the color changer fn on the chosen cell
       };
-      setInterval(simonCells, 2); // call the cell picker within an interval timer
+
+  // Fourth, use the interval timer to control the frequency of changes
+      setInterval(simonCells, 1); // call the cell picker within an interval timer
     </script>
 
   </body>
 </html>
+
