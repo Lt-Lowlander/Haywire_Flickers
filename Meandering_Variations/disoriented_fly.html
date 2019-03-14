@@ -61,7 +61,8 @@
       };
 
   // First, construct a Cell Matrix
-      colArray.forEach(function(k){  // nest 2 forEach loops to iterate through individual cells in each column and then a row of columns
+      colArray.forEach(function(k){  // nest 2 forEach loops to iterate through
+        // individual cells in each column and then a row of columns
         const mainDiv = document.getElementById('main');
         var colDiv = document.createElement('div');
         colDiv.id = 'child';
@@ -94,7 +95,7 @@
           y = Number(scalars[1]);
           cell = `${x},${y}`;
 
-// Use a function to determine where the next move will be
+ // Use a function to determine where the next move will be
           function disorient(a,b,here) {
               // establish an array of the coordinates for cells in all adjacent directions
             let direcArray = [[a-1, a, a+1],[b-1, b, b+1]];
