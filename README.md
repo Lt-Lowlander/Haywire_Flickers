@@ -1,11 +1,10 @@
-# Haywire_Flickers
-An experiment in vanilla javascript
 
-For local deployment, open this .html file in your browser of choice.
+A collection of experiments in vanilla JavaScript
 
-*Lines 44 & 45 dictate the grid dimensions, and lines 34 & 35 dictate the individual cell dimensions
+Most of the projects in this repo ought to have their own README files and brief descriptions.  Look there for more specific info!
 
-*Line 96 controls the speed of the color changes
+
+Generally, for local deployment open .html file in your browser of choice.
 
 
 Enjoy!

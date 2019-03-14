@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="UTF-8">
+    <title>Haywire Flickers</title>
+  </head>
+
+  <body>
+    <div id="parent">
+      <div id="main">
+      </div>
+    </div>
+
+    <style>
+      #parent {
+        display: flex;
+      }
+
+      #main {
+        align-items: flex-start;
+        display: flex;
+        width: auto;
+      }
+
+      #child {
+        display: flex;
+        flex-direction: column;
+        width: auto;
+      }
+
+      #single-box {
+        display: flex;
+        height: 1rem;
+        width: 1rem;
+        margin: 0.1rem;
+        background: red;
+      }
+
+    </style>
+
+    <script type="text/javascript">
+// The goal is to create a sporadic path from a randomly chosen starting point
+// on a grid of arbitrary size.
+
+      const rowQuant = 32;  // set the number of grid rows
+      const colQuant = 32;  // set the number of grid columns
+      const d4 = 1000;  // set the timespan between function calls (in milliseconds)
+
+      var traverse = 0;  // counter for steps taken
+      let currentX;  // updates the current coordinates of the trailblazer
+      let currentY;  // updates the current coordinates of the trailblazer
+
+      let rowArray = [];  // turn the row number into an array of unique indices
+      for (var i = 0; i < rowQuant; i++) {
+        rowArray.push(i);
+      };
+
+      let colArray = [];  // turn the column number into an array of unique rows
+      for (var i = 0; i < colQuant; i++) {
+        colArray.push(i);
+      };
+
+  // First, construct a Cell Matrix
+      colArray.forEach(function(k){  // nest 2 forEach loops to iterate through individual cells in each column and then a row of columns
+        const mainDiv = document.getElementById('main');
+        var colDiv = document.createElement('div');
+        colDiv.id = 'child';
+        colDiv.style.order = `${k}`;
+        rowArray.forEach(function(j){
+          var singleBox = document.createElement('div');
+          singleBox.className = `${k},${j}`;
+          singleBox.id = 'single-box';
+          singleBox.style.order = `${j}`;
+          colDiv.appendChild(singleBox);  // throw the individual cells inside the first column div
+        });
+        mainDiv.appendChild(colDiv); // throw the column divs inside the mainDiv
+      });
+
+  // Second, use a function to randomly pick one of the matrix cells
+      function steppingCell() {
+        let x;
+        let y;
+        if (traverse === 0) {
+          x = Math.floor(Math.random()*colQuant);
+          y = Math.floor(Math.random()*rowQuant);
+        } else {
+          console.log(`current position: ${currentX},${currentY}`)
+          x = currentX
+          y = currentY;
+          const surroundingDirections = [`${x-1},${y}`,`${x+1},${y}`,`${x},${y-1}`,`${x},${y+1}`];
+          // an array of the coordinates for cells in all 4 cardinal directions
+          debugger
+          let nextSteps = [];
+
+        }
+        const cell = `${x},${y}`;
+console.log(cell);
+        const swatchCell = document.getElementsByClassName(`${cell}`);
+        swatchCell[0].style.background = 'black';
+        traverse += 1;
+        currentX = x;
+        currentY = y;
+console.log(`step number: ${traverse}`);
+debugger
+        // trailBlazer(cell); // call the path color changer fn on the chosen cell
+      };
+
+  // Third, use the interval timer to control the frequency of changes
+      setInterval(steppingCell, d4); // call the cell picker within an interval timer
+    </script>
+
+  </body>
+</html>
