@@ -110,14 +110,14 @@
                 // establish an array of the coordinates for cells in all adjacent directions
               let direcArray = [[a-1, a, a+1],[b-1, b, b+1]];
                 // remove all the
-              if (a == colQuant) {
-                direcArray[0].pop();
-              } else if (a == 0) {
-                direcArray[0].shift();
-              } else if (b == rowQuant) {
-                direcArray[1].pop();
-              } else if (b == 0) {
-                direcArray[1].shift();
+              if (a == colQuant) {  // check the right edge
+                direcArray[0].pop(); // prevent from moving further right by removing the 'a+1' term
+              } else if (a == 0) {  // check the left edge
+                direcArray[0].shift();  // prevent from moving further left by removing the 'a-1' term
+              } else if (b == rowQuant) {  // check the bottom edge
+                direcArray[1].pop();  // prevent from moving further down by removing the 'b+1' term
+              } else if (b == 0) {  // check the top edge
+                direcArray[1].shift();  // prevent from moving further up by removing the 'b-1' term
               }
               const horiz = Math.floor(Math.random()*direcArray[0].length);
               const vert = Math.floor(Math.random()*direcArray[1].length);
@@ -168,7 +168,9 @@ console.log('repeated square');
           const oldVertVar = oldUpDown[0];
           const oldUpright = document.getElementsByClassName(`col:${oldVertVar}`);
           const oldLongitude = oldUpright[0];
-          oldLongitude.style.margin = '0.1rem';
+          if (vertVar != oldVertVar) {
+            oldLongitude.style.margin = '0.1rem';
+          }
           currentPosition = cell;
         }
         traverse += 1;
