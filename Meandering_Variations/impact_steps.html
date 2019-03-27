@@ -34,7 +34,13 @@
         height: 2rem;
         width: 2rem;
         margin: 0.1rem;
+        transition: all .25s ease;  /* transition time measured in seconds */
         background: red;
+      }
+      .footprint {
+        /* margin: 0.3rem; */
+        transform: scale(2);
+        border-radius: 0.4rem;
       }
 
     </style>
@@ -42,13 +48,10 @@
     <script type="text/javascript">
 // The goal is to create a sporadic path from a randomly chosen starting point
 // on a grid of arbitrary size.
+// This time, a randomly chosen tile will temporarily transition to a larger cell size.
 
       const rowQuant = 16;  // set the number of grid rows
       const colQuant = 16;  // set the number of grid columns
-      const d4 = 25;  // set the timespan between function calls (in milliseconds)
-
-      var traverse = 0;  // counter for steps taken
-      let currentPosition;  // updates the current coordinates of the trailblazer
 
       let rowArray = [];  // turn the row number into an array of unique indices
       for (var i = 0; i < rowQuant; i++) {
@@ -66,6 +69,7 @@
         const mainDiv = document.getElementById('main');
         var colDiv = document.createElement('div');
         colDiv.id = 'child';
+        colDiv.className = `col:${k}`;
         colDiv.style.order = `${k}`;
         rowArray.forEach(function(j){
           var singleBox = document.createElement('div');
@@ -77,60 +81,98 @@
         mainDiv.appendChild(colDiv); // throw the column divs inside the mainDiv
       });
 
+
+      const d4 = 250;  // set the timespan between function calls (in milliseconds)
+      var traverse = 0;  // counter for number of steps taken since page load
+      let currentPosition;  // updates the current coordinates of the trailblazer
+
   // Second, use a function to randomly pick one of the adjacent matrix cells
   //   to the current position
       function steppingCell() {
-        let x;
-        let y;
-        let cell;
-        let newBearing;
+        let x;  // variable to indicate the column in a cell's className
+        let y;  // variable to indicate the row in a cell's className
+        let cell;  // variable for the cell's full className
+        let newBearing;  // variable for the next randomly chosen neighbor to the current cell
         if (traverse === 0) {
           x = Math.floor(Math.random()*colQuant);
           y = Math.floor(Math.random()*rowQuant);
           cell = `${x},${y}`;
           currentPosition = cell;
         } else {
+          console.log(`current position: ${currentPosition}`);
           const scalars = currentPosition.split(',');
           x = Number(scalars[0]);
           y = Number(scalars[1]);
           cell = `${x},${y}`;
 
- // Use a function to determine where the next move will be
-          function disorient(a,b,here) {
-              // establish an array of the coordinates for cells in all adjacent directions
-            let direcArray = [[a-1, a, a+1],[b-1, b, b+1]];
-              // remove all the
-            if (a == colQuant) {
-              direcArray[0].pop();  //  in parentheses for splicing is index, then quantity of items
-            } else if (a == 0) {
-              direcArray[0].shift();  //  in parentheses for splicing is index, then quantity of items
-            } else if (b == rowQuant) {
-              direcArray[1].pop();  //  in parentheses for splicing is index, then quantity of items
-            } else if (b == 0) {
-              direcArray[1].shift();  //  in parentheses for splicing is index, then quantity of items
-            }
-            const horiz = Math.floor(Math.random()*direcArray[0].length);
-            const vert = Math.floor(Math.random()*direcArray[1].length);
-            var onward = `${direcArray[0][horiz]},${direcArray[1][vert]}`;
-            if (onward == here) {  // reroll if the new position is the same as the current position
-              onward = disorient(a,b,here);
-            } else {
-              return onward;
+ // Use a function to pick a neighboring cell for the next move
+            function disorient(a,b,here) {
+                // establish an array of the coordinates for cells in all adjacent directions
+              let direcArray = [[a-1, a, a+1],[b-1, b, b+1]];
+                // remove all the
+              if (a == colQuant) {
+                direcArray[0].pop();
+              } else if (a == 0) {
+                direcArray[0].shift();
+              } else if (b == rowQuant) {
+                direcArray[1].pop();
+              } else if (b == 0) {
+                direcArray[1].shift();
+              }
+              const horiz = Math.floor(Math.random()*direcArray[0].length);
+              const vert = Math.floor(Math.random()*direcArray[1].length);
+              var onward = `${direcArray[0][horiz]},${direcArray[1][vert]}`;
+              if (onward == here) {  // reroll if the new position is the same as the current position
+console.log('repeated square');
+                onward = disorient(a,b,here);
+              } else {
+                return onward;
+              };
             };
+
+            newBearing = disorient(x,y,cell);
+            cell = newBearing;
           };
-          newBearing = disorient(x,y,cell);
-          cell = newBearing;
-        };
-        const swatchCell = document.getElementsByClassName(`${cell}`);
+
+  /////////////////////////////////////////////////////////////////////////
+  // check out the grid values for columns and rows in another call here //
+  /////////////////////////////////////////////////////////////////////////
+        console.log(`cell = ${cell}`);
+        const upDown = cell.split(',');
+        const vertVar = Number(upDown[0]);
+        const upright = document.getElementsByClassName(`col:${vertVar}`);
+        const longitude = upright[0];
+        longitude.style.margin = '0 1.2rem 0 1.2rem';
+  /////////////////////////////////////////////////////////////////////////
+  // check out the grid values for columns and rows in another call here //
+  /////////////////////////////////////////////////////////////////////////
+        const swatchCell = document.getElementsByClassName(`${cell}`);  // swatchCell is the variable to manipulate currently the active cell
+        console.log(`swatchCell[0] = ${swatchCell[0]}`);
         swatchCell[0].style.background = 'black';
-        console.log(`current position: ${cell}`);
+        swatchCell[0].style.margin = '0.3rem';
+        console.log(`present location: ${cell}`);
         console.log(`step number: ${traverse}`);
+        swatchCell[0].classList.add('footprint');
+
+        ///////////////////////////////////////////////////////////////////////
+        // Now put the previous steps, rows, and columns back into the grid  //
+        ///////////////////////////////////////////////////////////////////////
+
         if (traverse > 0) {
           const oldPosition = document.getElementsByClassName(`${currentPosition}`);
-          oldPosition[0].style.background = 'red';
+          const prevStep = oldPosition[0];
+          prevStep.style.background = 'red';
+          prevStep.style.margin = '0.1rem';
+          prevStep.classList.remove('footprint');
+          const oldUpDown = currentPosition.split(',');
+          const oldVertVar = oldUpDown[0];
+          const oldUpright = document.getElementsByClassName(`col:${oldVertVar}`);
+          const oldLongitude = oldUpright[0];
+          oldLongitude.style.margin = '0.1rem';
           currentPosition = cell;
         }
         traverse += 1;
+debugger
       };
 
   // Third, use the interval timer to control the frequency of changes
