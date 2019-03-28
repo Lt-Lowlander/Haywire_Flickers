@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="UTF-8">
+    <title>Impact Steps</title>
+  </head>
+
+  <body>
+    <div id="parent">
+      <div id="main">
+      </div>
+    </div>
+
+    <style>
+      #parent {
+        display: flex;
+      }
+
+      #main {
+        align-items: flex-start;
+        display: flex;
+        width: auto;
+      }
+
+      #child {
+        display: flex;
+        flex-direction: column;
+        width: auto;
+      }
+
+      #single-box {
+        display: flex;
+        height: 2rem;
+        width: 2rem;
+        margin: 0.1rem;
+        transition: all .25s ease;  /* transition time measured in seconds */
+        background: red;
+      }
+      .footprint {
+        transform: scale(2);
+        border-radius: 0.4rem;
+      }
+
+    </style>
+
+    <script type="text/javascript">
+// The goal is to create a sporadic path from a randomly chosen starting point
+// on a grid of arbitrary size.
+// This time, a randomly chosen tile will temporarily transition to a larger cell size.
+
+      const rowQuant = 16;  // set the number of grid rows
+      const colQuant = 16;  // set the number of grid columns
+
+      let rowArray = [];  // turn the row number into an array of unique indices
+      for (var i = 0; i < rowQuant; i++) {
+        rowArray.push(i);
+      };
+
+      let colArray = [];  // turn the column number into an array of unique rows
+      for (var i = 0; i < colQuant; i++) {
+        colArray.push(i);
+      };
+
+  // First, construct a Cell Matrix
+      colArray.forEach(function(k){  // nest 2 forEach loops to iterate through
+        // individual cells in each column and then a row of columns
+        const mainDiv = document.getElementById('main');
+        var colDiv = document.createElement('div');
+        colDiv.id = 'child';
+        colDiv.className = `col:${k}`;
+        colDiv.style.order = `${k}`;
+        rowArray.forEach(function(j){
+          var singleBox = document.createElement('div');
+          singleBox.className = `${k},${j}`;
+          singleBox.id = 'single-box';
+          singleBox.style.order = `${j}`;
+          colDiv.appendChild(singleBox);  // throw the individual cells inside the first column div
+        });
+        mainDiv.appendChild(colDiv); // throw the column divs inside the mainDiv
+      });
+
+      const d4 = 250;  // set the timespan between function calls (in milliseconds)
+      var traverse = 0;  // counter for number of steps taken since page load
+      let currentPosition;  // updates the current coordinates of the trailblazer
+
+  // Second, use a function to randomly pick one of the adjacent matrix cells
+  //   to the current position
+      function steppingCell() {
+        let x;  // variable to indicate the column in a cell's className
+        let y;  // variable to indicate the row in a cell's className
+        let cell;  // variable for the cell's full className
+        let newBearing;  // variable for the next randomly chosen neighbor to the current cell
+        if (traverse === 0) {
+          x = Math.floor(Math.random()*colQuant);
+          y = Math.floor(Math.random()*rowQuant);
+          cell = `${x},${y}`;
+          currentPosition = cell;
+        } else {
+          const scalars = currentPosition.split(',');
+          x = Number(scalars[0]);
+          y = Number(scalars[1]);
+          cell = `${x},${y}`;
+
+ // Use a function to pick a neighboring cell for the next move
+          function disorient(a,b) { // establish an array of the coordinates for cells in all adjacent directions
+            const up = `${a},${b-1}`;
+            const right = `${a+1},${b}`;
+            const down = `${a},${b+1}`;
+            const left = `${a-1},${b}`;
+            const rightUp = `${a+1},${b-1}`;
+            const rightDown = `${a+1},${b+1}`;
+            const leftDown = `${a-1},${b+1}`;
+            const leftUp = `${a-1},${b-1}`;
+            let donut;
+              if (a == colQuant - 1 && b == 0) {     // top right corner
+                donut = [left, down, leftDown];
+              } else if (a == colQuant - 1 && b == rowQuant - 1) {     // bottom right corner
+                donut = [left, up, leftUp];
+              } else if (a == 0 && b == rowQuant - 1) {     // bottom left corner
+                donut = [right, up, rightUp];
+              } else if (a == 0 && b == 0) {     // top left corner
+                donut = [right, down, rightDown];
+              } else if (a == colQuant - 1) {     // right edge
+                donut = [up, down, left, leftDown, leftUp];
+              } else if (a == 0) {    // left edge
+                donut = [up, right, down, rightUp, rightDown];
+              } else if (b == rowQuant - 1) {     // bottom edge
+                donut = [up, right, left, rightUp, leftUp];
+              } else if (b == 0) {     // top edge
+                donut = [right, down, left, rightDown, leftDown];
+              } else {    // general case
+                donut = [up, right, down, left, rightUp, rightDown, leftDown, leftUp];
+              };
+            const leaning = Math.floor(Math.random()*donut.length);
+            const dowsingRod = donut[leaning];
+            return dowsingRod;
+          };
+          newBearing = disorient(x,y);
+          cell = newBearing;
+        };
+/////////////////////////////////////////////////////////////////////////
+// check out the grid values for columns and rows in another call here //
+/////////////////////////////////////////////////////////////////////////
+        const upDown = cell.split(',');
+        const vertVar = Number(upDown[0]);
+        const upright = document.getElementsByClassName(`col:${vertVar}`);
+        const longitude = upright[0];
+        longitude.style.margin = '0 1.2rem 0 1.2rem';
+/////////////////////////////////////////////////////////////////////////
+// check out the grid values for columns and rows in another call here //
+/////////////////////////////////////////////////////////////////////////
+        const swatchCell = document.getElementsByClassName(`${cell}`);  // swatchCell is the variable to manipulate currently the active cell
+        swatchCell[0].style.background = 'black';
+        swatchCell[0].style.margin = '0.3rem';
+        swatchCell[0].classList.add('footprint');
+///////////////////////////////////////////////////////////////////////
+// Now put the previous steps, rows, and columns back into the grid  //
+///////////////////////////////////////////////////////////////////////
+        if (traverse > 0) {
+          const oldPosition = document.getElementsByClassName(`${currentPosition}`);
+          const prevStep = oldPosition[0];
+          prevStep.style.background = 'red';
+          prevStep.style.margin = '0.1rem';
+          prevStep.classList.remove('footprint');
+          const oldUpDown = currentPosition.split(',');
+          const oldVertVar = oldUpDown[0];
+          const oldUpright = document.getElementsByClassName(`col:${oldVertVar}`);
+          const oldLongitude = oldUpright[0];
+          if (vertVar != oldVertVar) {
+            oldLongitude.style.margin = '0.1rem';
+          };
+          currentPosition = cell;
+        };
+        traverse += 1;
+      };
+  // Third, use the interval timer to control the frequency of changes
+      setInterval(steppingCell, d4); // call the cell picker within an interval timer
+    </script>
+  </body>
+</html>
