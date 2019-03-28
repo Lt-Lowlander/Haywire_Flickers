@@ -106,31 +106,43 @@
           cell = `${x},${y}`;
 
  // Use a function to pick a neighboring cell for the next move
-            function disorient(a,b,here) {
+            function disorient(a,b) {
                 // establish an array of the coordinates for cells in all adjacent directions
-              let direcArray = [[a-1, a, a+1],[b-1, b, b+1]];
-                // remove all the
-              if (a == colQuant) {  // check the right edge
-                direcArray[0].pop(); // prevent from moving further right by removing the 'a+1' term
-              } else if (a == 0) {  // check the left edge
-                direcArray[0].shift();  // prevent from moving further left by removing the 'a-1' term
-              } else if (b == rowQuant) {  // check the bottom edge
-                direcArray[1].pop();  // prevent from moving further down by removing the 'b+1' term
-              } else if (b == 0) {  // check the top edge
-                direcArray[1].shift();  // prevent from moving further up by removing the 'b-1' term
-              }
-              const horiz = Math.floor(Math.random()*direcArray[0].length);
-              const vert = Math.floor(Math.random()*direcArray[1].length);
-              var onward = `${direcArray[0][horiz]},${direcArray[1][vert]}`;
-              if (onward == here) {  // reroll if the new position is the same as the current position
-console.log('repeated square');
-                onward = disorient(a,b,here);
-              } else {
-                return onward;
-              };
+                const up = `${a},${b-1}`;
+                const right = `${a+1},${b}`;
+                const down = `${a},${b+1}`;
+                const left = `${a-1},${b}`;
+                const rightUp = `${a+1},${b-1}`;
+                const rightDown = `${a+1},${b+1}`;
+                const leftDown = `${a-1},${b+1}`;
+                const leftUp = `${a-1},${b-1}`;
+                let donut;
+                if (a == colQuant - 1 && b == 0) {     // top right corner
+                  donut = [left, down, leftDown];
+                } else if (a == colQuant - 1 && b == rowQuant - 1) {     // bottom right corner
+                  donut = [left, up, leftUp];
+                } else if (a == 0 && b == rowQuant - 1) {     // bottom left corner
+                  donut = [right, up, rightUp];
+                } else if (a == 0 && b == 0) {     // top left corner
+                  donut = [right, down, rightDown];
+                } else if (a == colQuant - 1) {     // right edge
+                  donut = [up, down, left, leftDown, leftUp];
+                } else if (a == 0) {    // left edge
+                  donut = [up, right, down, rightUp, rightDown];
+                } else if (b == rowQuant - 1) {     // bottom edge
+                  donut = [up, right, left, rightUp, leftUp];
+                } else if (b == 0) {     // top edge
+                  donut = [right, down, left, rightDown, leftDown];
+                } else {    // general case
+                  donut = [up, right, down, left, rightUp, rightDown, leftDown, leftUp];
+                };
+              const leaning = Math.floor(Math.random()*donut.length);
+              const dowsingRod = donut[leaning];
+              console.log(`dowsingRod = ${dowsingRod}`);
+              return dowsingRod;
             };
 
-            newBearing = disorient(x,y,cell);
+            newBearing = disorient(x,y);
             cell = newBearing;
           };
 
@@ -141,12 +153,15 @@ console.log('repeated square');
         const upDown = cell.split(',');
         const vertVar = Number(upDown[0]);
         const upright = document.getElementsByClassName(`col:${vertVar}`);
+        console.log(`upright = ${upright}`);
         const longitude = upright[0];
         longitude.style.margin = '0 1.2rem 0 1.2rem';
   /////////////////////////////////////////////////////////////////////////
   // check out the grid values for columns and rows in another call here //
   /////////////////////////////////////////////////////////////////////////
         const swatchCell = document.getElementsByClassName(`${cell}`);  // swatchCell is the variable to manipulate currently the active cell
+        console.log(`swatchCell = ${swatchCell}`);
+
         console.log(`swatchCell[0] = ${swatchCell[0]}`);
         swatchCell[0].style.background = 'black';
         swatchCell[0].style.margin = '0.3rem';
@@ -174,7 +189,7 @@ console.log('repeated square');
           currentPosition = cell;
         }
         traverse += 1;
-debugger
+// debugger
       };
 
   // Third, use the interval timer to control the frequency of changes
