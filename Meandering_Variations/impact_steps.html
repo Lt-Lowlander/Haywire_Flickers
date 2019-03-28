@@ -3,7 +3,7 @@
 
   <head>
     <meta charset="UTF-8">
-    <title>Haywire Flickers</title>
+    <title>Impact Steps</title>
   </head>
 
   <body>
@@ -38,7 +38,6 @@
         background: red;
       }
       .footprint {
-        /* margin: 0.3rem; */
         transform: scale(2);
         border-radius: 0.4rem;
       }
@@ -81,7 +80,6 @@
         mainDiv.appendChild(colDiv); // throw the column divs inside the mainDiv
       });
 
-
       const d4 = 250;  // set the timespan between function calls (in milliseconds)
       var traverse = 0;  // counter for number of steps taken since page load
       let currentPosition;  // updates the current coordinates of the trailblazer
@@ -99,80 +97,66 @@
           cell = `${x},${y}`;
           currentPosition = cell;
         } else {
-          console.log(`current position: ${currentPosition}`);
           const scalars = currentPosition.split(',');
           x = Number(scalars[0]);
           y = Number(scalars[1]);
           cell = `${x},${y}`;
 
  // Use a function to pick a neighboring cell for the next move
-            function disorient(a,b) {
-                // establish an array of the coordinates for cells in all adjacent directions
-                const up = `${a},${b-1}`;
-                const right = `${a+1},${b}`;
-                const down = `${a},${b+1}`;
-                const left = `${a-1},${b}`;
-                const rightUp = `${a+1},${b-1}`;
-                const rightDown = `${a+1},${b+1}`;
-                const leftDown = `${a-1},${b+1}`;
-                const leftUp = `${a-1},${b-1}`;
-                let donut;
-                if (a == colQuant - 1 && b == 0) {     // top right corner
-                  donut = [left, down, leftDown];
-                } else if (a == colQuant - 1 && b == rowQuant - 1) {     // bottom right corner
-                  donut = [left, up, leftUp];
-                } else if (a == 0 && b == rowQuant - 1) {     // bottom left corner
-                  donut = [right, up, rightUp];
-                } else if (a == 0 && b == 0) {     // top left corner
-                  donut = [right, down, rightDown];
-                } else if (a == colQuant - 1) {     // right edge
-                  donut = [up, down, left, leftDown, leftUp];
-                } else if (a == 0) {    // left edge
-                  donut = [up, right, down, rightUp, rightDown];
-                } else if (b == rowQuant - 1) {     // bottom edge
-                  donut = [up, right, left, rightUp, leftUp];
-                } else if (b == 0) {     // top edge
-                  donut = [right, down, left, rightDown, leftDown];
-                } else {    // general case
-                  donut = [up, right, down, left, rightUp, rightDown, leftDown, leftUp];
-                };
-              const leaning = Math.floor(Math.random()*donut.length);
-              const dowsingRod = donut[leaning];
-              console.log(`dowsingRod = ${dowsingRod}`);
-              return dowsingRod;
-            };
-
-            newBearing = disorient(x,y);
-            cell = newBearing;
+          function disorient(a,b) { // establish an array of the coordinates for cells in all adjacent directions
+            const up = `${a},${b-1}`;
+            const right = `${a+1},${b}`;
+            const down = `${a},${b+1}`;
+            const left = `${a-1},${b}`;
+            const rightUp = `${a+1},${b-1}`;
+            const rightDown = `${a+1},${b+1}`;
+            const leftDown = `${a-1},${b+1}`;
+            const leftUp = `${a-1},${b-1}`;
+            let donut;
+              if (a == colQuant - 1 && b == 0) {     // top right corner
+                donut = [left, down, leftDown];
+              } else if (a == colQuant - 1 && b == rowQuant - 1) {     // bottom right corner
+                donut = [left, up, leftUp];
+              } else if (a == 0 && b == rowQuant - 1) {     // bottom left corner
+                donut = [right, up, rightUp];
+              } else if (a == 0 && b == 0) {     // top left corner
+                donut = [right, down, rightDown];
+              } else if (a == colQuant - 1) {     // right edge
+                donut = [up, down, left, leftDown, leftUp];
+              } else if (a == 0) {    // left edge
+                donut = [up, right, down, rightUp, rightDown];
+              } else if (b == rowQuant - 1) {     // bottom edge
+                donut = [up, right, left, rightUp, leftUp];
+              } else if (b == 0) {     // top edge
+                donut = [right, down, left, rightDown, leftDown];
+              } else {    // general case
+                donut = [up, right, down, left, rightUp, rightDown, leftDown, leftUp];
+              };
+            const leaning = Math.floor(Math.random()*donut.length);
+            const dowsingRod = donut[leaning];
+            return dowsingRod;
           };
-
-  /////////////////////////////////////////////////////////////////////////
-  // check out the grid values for columns and rows in another call here //
-  /////////////////////////////////////////////////////////////////////////
-        console.log(`cell = ${cell}`);
+          newBearing = disorient(x,y);
+          cell = newBearing;
+        };
+/////////////////////////////////////////////////////////////////////////
+// check out the grid values for columns and rows in another call here //
+/////////////////////////////////////////////////////////////////////////
         const upDown = cell.split(',');
         const vertVar = Number(upDown[0]);
         const upright = document.getElementsByClassName(`col:${vertVar}`);
-        console.log(`upright = ${upright}`);
         const longitude = upright[0];
         longitude.style.margin = '0 1.2rem 0 1.2rem';
-  /////////////////////////////////////////////////////////////////////////
-  // check out the grid values for columns and rows in another call here //
-  /////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////
+// check out the grid values for columns and rows in another call here //
+/////////////////////////////////////////////////////////////////////////
         const swatchCell = document.getElementsByClassName(`${cell}`);  // swatchCell is the variable to manipulate currently the active cell
-        console.log(`swatchCell = ${swatchCell}`);
-
-        console.log(`swatchCell[0] = ${swatchCell[0]}`);
         swatchCell[0].style.background = 'black';
         swatchCell[0].style.margin = '0.3rem';
-        console.log(`present location: ${cell}`);
-        console.log(`step number: ${traverse}`);
         swatchCell[0].classList.add('footprint');
-
-        ///////////////////////////////////////////////////////////////////////
-        // Now put the previous steps, rows, and columns back into the grid  //
-        ///////////////////////////////////////////////////////////////////////
-
+///////////////////////////////////////////////////////////////////////
+// Now put the previous steps, rows, and columns back into the grid  //
+///////////////////////////////////////////////////////////////////////
         if (traverse > 0) {
           const oldPosition = document.getElementsByClassName(`${currentPosition}`);
           const prevStep = oldPosition[0];
@@ -185,16 +169,13 @@
           const oldLongitude = oldUpright[0];
           if (vertVar != oldVertVar) {
             oldLongitude.style.margin = '0.1rem';
-          }
+          };
           currentPosition = cell;
-        }
+        };
         traverse += 1;
-// debugger
       };
-
   // Third, use the interval timer to control the frequency of changes
       setInterval(steppingCell, d4); // call the cell picker within an interval timer
     </script>
-
   </body>
 </html>

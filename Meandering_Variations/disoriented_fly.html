@@ -3,7 +3,7 @@
 
   <head>
     <meta charset="UTF-8">
-    <title>Haywire Flickers</title>
+    <title>Disoriented Fly</title>
   </head>
 
   <body>
@@ -95,30 +95,41 @@
           y = Number(scalars[1]);
           cell = `${x},${y}`;
 
- // Use a function to determine where the next move will be
-          function disorient(a,b,here) {
-              // establish an array of the coordinates for cells in all adjacent directions
-            let direcArray = [[a-1, a, a+1],[b-1, b, b+1]];
-              // remove all the
-            if (a == colQuant) {
-              direcArray[0].pop();  //  in parentheses for splicing is index, then quantity of items
-            } else if (a == 0) {
-              direcArray[0].shift();  //  in parentheses for splicing is index, then quantity of items
-            } else if (b == rowQuant) {
-              direcArray[1].pop();  //  in parentheses for splicing is index, then quantity of items
-            } else if (b == 0) {
-              direcArray[1].shift();  //  in parentheses for splicing is index, then quantity of items
-            }
-            const horiz = Math.floor(Math.random()*direcArray[0].length);
-            const vert = Math.floor(Math.random()*direcArray[1].length);
-            var onward = `${direcArray[0][horiz]},${direcArray[1][vert]}`;
-            if (onward == here) {  // reroll if the new position is the same as the current position
-              onward = disorient(a,b,here);
-            } else {
-              return onward;
-            };
-          };
-          newBearing = disorient(x,y,cell);
+    // Use a function to pick a neighboring cell for the next move
+         function disorient(a,b) { // establish an array of the coordinates for cells in all adjacent directions
+           const up = `${a},${b-1}`;
+           const right = `${a+1},${b}`;
+           const down = `${a},${b+1}`;
+           const left = `${a-1},${b}`;
+           const rightUp = `${a+1},${b-1}`;
+           const rightDown = `${a+1},${b+1}`;
+           const leftDown = `${a-1},${b+1}`;
+           const leftUp = `${a-1},${b-1}`;
+           let donut;
+             if (a == colQuant - 1 && b == 0) {     // top right corner
+               donut = [left, down, leftDown];
+             } else if (a == colQuant - 1 && b == rowQuant - 1) {     // bottom right corner
+               donut = [left, up, leftUp];
+             } else if (a == 0 && b == rowQuant - 1) {     // bottom left corner
+               donut = [right, up, rightUp];
+             } else if (a == 0 && b == 0) {     // top left corner
+               donut = [right, down, rightDown];
+             } else if (a == colQuant - 1) {     // right edge
+               donut = [up, down, left, leftDown, leftUp];
+             } else if (a == 0) {    // left edge
+               donut = [up, right, down, rightUp, rightDown];
+             } else if (b == rowQuant - 1) {     // bottom edge
+               donut = [up, right, left, rightUp, leftUp];
+             } else if (b == 0) {     // top edge
+               donut = [right, down, left, rightDown, leftDown];
+             } else {    // general case
+               donut = [up, right, down, left, rightUp, rightDown, leftDown, leftUp];
+             };
+           const leaning = Math.floor(Math.random()*donut.length);
+           const dowsingRod = donut[leaning];
+           return dowsingRod;
+         };
+          newBearing = disorient(x,y);
           cell = newBearing;
         };
         const swatchCell = document.getElementsByClassName(`${cell}`);
