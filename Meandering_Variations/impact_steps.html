@@ -26,7 +26,8 @@
       #child {
         display: flex;
         flex-direction: column;
-        width: auto;
+        width: 2rem;
+        margin: 0.1rem;
       }
 
       #single-box {
@@ -34,11 +35,11 @@
         height: 2rem;
         width: 2rem;
         margin: 0.1rem;
-        transition: all .25s ease;  /* transition time measured in seconds */
+
         background: red;
       }
       .footprint {
-        transform: scale(2);
+        transform: scale(1.6);
         border-radius: 0.4rem;
       }
 
@@ -72,7 +73,8 @@
         colDiv.style.order = `${k}`;
         rowArray.forEach(function(j){
           var singleBox = document.createElement('div');
-          singleBox.className = `${k},${j}`;
+          singleBox.className = `${k},${j} row:${j}`;
+          // singleBox.className = `row:${j}`;
           singleBox.id = 'single-box';
           singleBox.style.order = `${j}`;
           colDiv.appendChild(singleBox);  // throw the individual cells inside the first column div
@@ -87,6 +89,7 @@
   // Second, use a function to randomly pick one of the adjacent matrix cells
   //   to the current position
       function steppingCell() {
+// debugger
         let x;  // variable to indicate the column in a cell's className
         let y;  // variable to indicate the row in a cell's className
         let cell;  // variable for the cell's full className
@@ -142,17 +145,24 @@
 /////////////////////////////////////////////////////////////////////////
 // check out the grid values for columns and rows in another call here //
 /////////////////////////////////////////////////////////////////////////
-        const upDown = cell.split(',');
-        const vertVar = Number(upDown[0]);
-        const upright = document.getElementsByClassName(`col:${vertVar}`);
-        const longitude = upright[0];
-        longitude.style.margin = '0 1.2rem 0 1.2rem';
+        const coords = cell.split(',');
+        const vertVar = Number(coords[0]);
+        const ladderPoles = document.getElementsByClassName(`col:${vertVar}`);
+        const longitude = ladderPoles[0];
+        longitude.style.margin = '0.1rem 1.2rem 0.1rem 1.2rem';
+        const horizVar = Number(coords[1]);
+        const ladderRungs = document.getElementsByClassName(`row:${horizVar}`);
+        [].forEach.call(ladderRungs, function(latitude) {  // This notation takes an HTMLcollection and treats it like and array
+          latitude.style.margin = '1.2rem 0.1rem 1.2rem 0.1rem';
+        });
 /////////////////////////////////////////////////////////////////////////
 // check out the grid values for columns and rows in another call here //
 /////////////////////////////////////////////////////////////////////////
+// debugger
         const swatchCell = document.getElementsByClassName(`${cell}`);  // swatchCell is the variable to manipulate currently the active cell
+// debugger
         swatchCell[0].style.background = 'black';
-        swatchCell[0].style.margin = '0.3rem';
+        // swatchCell[0].style.margin = '0.3rem';
         swatchCell[0].classList.add('footprint');
 ///////////////////////////////////////////////////////////////////////
 // Now put the previous steps, rows, and columns back into the grid  //
@@ -163,13 +173,24 @@
           prevStep.style.background = 'red';
           prevStep.style.margin = '0.1rem';
           prevStep.classList.remove('footprint');
-          const oldUpDown = currentPosition.split(',');
-          const oldVertVar = oldUpDown[0];
-          const oldUpright = document.getElementsByClassName(`col:${oldVertVar}`);
-          const oldLongitude = oldUpright[0];
+
+          const oldCoords = currentPosition.split(',');
+          const oldVertVar = oldCoords[0];    // placeholder for resetting the column spacing
+          const oldHorizVar = oldCoords[1];    // placeholder for resetting the row spacing
+
           if (vertVar != oldVertVar) {
+            const oldLadderPoles = document.getElementsByClassName(`col:${oldVertVar}`);
+            const oldLongitude = oldLadderPoles[0];
             oldLongitude.style.margin = '0.1rem';
           };
+
+          if (horizVar != oldHorizVar) {    // If the new step is in a different row, reset the previous row
+            const oldLadderRungs = document.getElementsByClassName(`row:${oldHorizVar}`);
+            [].forEach.call(oldLadderRungs, function(latitude) {  // This notation takes an HTMLcollection and treats it like and array
+              latitude.style.margin = '0.1rem';
+            });
+          };
+
           currentPosition = cell;
         };
         traverse += 1;
